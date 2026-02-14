@@ -172,7 +172,7 @@
         max-width: calc(50% - 3px);
       }
     </style>
-    
+    <script src="./build/senpaobs1.js" defer="defer"></script>
     <script
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
@@ -180,63 +180,5 @@
       data-cf-beacon='{"version":"2024.11.0","token":"497d356960844ff98050f21b0ff8af7d","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
       crossorigin="anonymous"
     ></script>
-
-    <div id="lock" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0b0b0b;color:#fff;z-index:999999">
-  <div style="width:320px;max-width:90vw">
-    <h2 style="margin:0 0 10px 0">Fut Key</h2>
-    <input id="keyInput" placeholder="KEY..." style="width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #333;background:#111;color:#fff" />
-    <button id="btn" style="width:100%;padding:10px;border-radius:8px;border:0">Hape</button>
-    <div id="msg" style="margin-top:10px;color:#ffb3b3"></div>
-  </div>
-</div>
-
-<script>
-(async () => {
-  const lock = document.getElementById("lock");
-  const msg = document.getElementById("msg");
-  const input = document.getElementById("keyInput");
-  const btn = document.getElementById("btn");
-
-  async function ping(token){
-    const r = await fetch("/api/ping", { headers: { Authorization: "Bearer " + token }});
-    return r.ok;
-  }
-
-  function loadGame() {
-    const s = document.createElement("script");
-    s.src = "./build/senpaobs1.js";   // ✅ ky është scripti yt kryesor
-    s.defer = true;
-    document.body.appendChild(s);
-  }
-
-  const saved = localStorage.getItem("license_token");
-  if (saved && await ping(saved)) {
-    lock.remove();
-    loadGame();
-    return;
-  }
-
-  btn.onclick = async () => {
-    msg.textContent = "";
-    const key = input.value.trim();
-
-    const r = await fetch("/api/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key })
-    });
-
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok || !data.ok) {
-      msg.textContent = data.error || "Gabim!";
-      return;
-    }
-
-    localStorage.setItem("license_token", data.token);
-    lock.remove();
-    loadGame();
-  };
-})();
-</script>
   </body>
 </html>
